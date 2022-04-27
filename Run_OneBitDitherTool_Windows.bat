@@ -1,1 +1,1 @@
-%CD%/love-11.4-win64/love %CD%
+"%CD%/love-11.4-win64/love" "%CD%"
