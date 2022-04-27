@@ -25,6 +25,7 @@ A 1-bit dithering tool written in [Love2D](https://love2d.org/). This tool relie
   - Dragging a folder will scan through the folder and find all .png, .jpg, and .jpeg files. Any other files will be ignored.
   - While using the file browser, you can select multiple files using CTRL+Click or SHIFT+Click. You must click "OK" to load the files, double clicking does not work.
 - If you have loaded multiple images, you can change the preview image with Left Arrow and Right Arrow.
+- You can use left mouse to click and drag the image around. Mouse wheel will zoom the image at integer scales.
 - Adjust Strength, Brightness, and Contrast sliders with the mouse. Clicking the name of the slider will reset to the defualt value.
 - Select a Dither Type in the drop down menu. Each dither type will have different settings available.
 - When you are happy with the results, click "Save All To Output Folder". This will iterate through all of the loaded images, apply the same dithering to each one, and then copy the images to the "output" folder in the OneBitDitherTool directory. Output images are always .png files.
