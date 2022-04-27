@@ -1,0 +1,69 @@
+v0.8.0
+==========
+[API]: Make Update and Draw functions private.
+[Android]: Receive feedback and make fixes to errant behavior. Applies to issue #35.
+[Frame]: API calls to setup frames (child regions in Dear ImGui). Can hook into Regions module and expose some functionality from this for this feature. #46.
+[LayoutManager]: Right aligned controls are flush on the edge. Should flush with the window border.
+[Mouse/Keyboard]: Allow multiple 'Update' calls. This will conflict with the async input processing. Might need to keep a cache of the last async update and always apply that to every 'Update' call.
+
+BUGS
+==========
+[Combo Box]: Selectable text not expanding to full width of window.
+[File Dialog]: Excess right border.
+[List Box]: View transform pops while parent window is resizing when scroll is in non-zero position.
+[List Box]: Region size not reset when list items change.
+[List Box]: Window not properly auto-sized.
+[Scroll Bar]: Color flicker when clicking and releasing on scroll bar.
+[Tooltip]: Gains focus when displayed. Focus should not be allowed.
+[Tree]: View transform not correct with content size. Content size may be incorrect.
+[Window]: Clamp window moving to viewport.
+
+TODO
+==========
+[Animation]: Initial animation support.
+[API]: Re-organize functions in categories and update comment.
+[API]: Get/Set cursor padding.
+[API]: Utilitze 'args' parameter for configuring docks, save state.
+[Column]: Investigate moving Column rendering to its own draw channel within an active batch to reduce scissor calls.
+[Column]: Move separator with mouse.
+Combo Box: Easy API with table of possible values.
+Context Menu: Investigate checking hot item and last item of window.
+Controls: Convert all window bounds check to use region.
+[Date Time]: Initial implementation for a date/time control.
+Dialog: Function to close all dialog boxes.
+Dialog: Modal/Non-modal dialogs.
+[Dock]: Flickers when using a custom love.run function with a fixed update interval.
+[Documentation]: Command-line option to just dump all functions listed in API table.
+[Error]: Dialog that shows any error messages.
+[Graph]: Initial line graph implementation.
+[Input]: Drag select word versus character.
+[Input]: Auto-grow control with MulitLine.
+[Input]: Range highlight using start and end tokens.
+[Keyboard]: Option to specify key as scan code.
+License: Show license for Kenney.nl assets.
+Main Menu Bar: Assert if called within a window context.
+[Menu]: Radio button like menu items.
+Region: Clamp position check with owning window's size.
+[Scroll Bar]: Velocity based movement for mouse wheel scrolling.
+[Scroll Bar]: Focus owning window if scroll bar is clicked.
+[Slab]: Move all love.* calls into interfaces for portability with other Lua based frameworks.
+SlabDebug: Show image stats.
+[SlabDebug]: Window management tools.
+[Stats]: Draw time draw command.
+[Stats]: Simple API access with list of stat names to display.
+Style: Add documentation for each style property.
+[Style]: API documentation.
+[Tab]: Initial implementation of a container holding Window instances with tabs for each.
+[Table]: Initial implementation.
+[Text]: Tooltip support.
+[Text]: Stats for text objects.
+[Text]: Deprecate SelectOnHover option.
+[Tree]: Fix for BeginContextMenuItem for root and children items.
+Window: Menu support.
+Window: Ids should be used as keys.
+Window: Deprecate window bounds values and use region directly.
+[Window]: Move default border size to Style.
+[Window]: Allow arrow key movements of window if option is set.
+[Window]: IsWindowOpen API function.
+Widgets: Track owning window's alpha channel.
+Widgets: Forward Options parameter to sub widgets.
