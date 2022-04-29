@@ -42,7 +42,7 @@ Unfortunately the love2d framework is not code-signed correctly so if you have t
 
 ## How to use
 - Download and extract OneBitDitherTool from the [Releases](https://github.com/timheigames/onebitdithertool/releases) section.
-- Run the app by using "Run_OneBitDitherTool_Windows.bat" on Windows, "Run_OneBitDitherTool_Linux.sh" on Linux or `love .` in a terminal window on macOS.
+- Run the app by using "Run_OneBitDitherTool_Windows.bat", "Run_OneBitDitherTool_Linux.sh" or `Run_OneBitDitherTool_macOS.sh`.
 - You can drag a single image into the window, drag a folder into the window, or use the file browser. (.png, .jpg, .jpeg are supported)
   - Dragging a folder will scan through the folder and find all .png, .jpg, and .jpeg files. Any other files will be ignored.
   - While using the file browser, you can select multiple files using CTRL+Click or SHIFT+Click. You must click "OK" to load the files, double clicking does not work.
