@@ -464,8 +464,8 @@ function CopyFile(source, destination)
 
     if Os == "Windows" then
         copyString = [[copy "]] .. source .. [[" "]] .. destination
-        copyString = string.gsub(copyString, [[/]], [[\]]) -- Converts paths to backslash for Windows. I think Mac and Linux use forward slash.
-    elseif Os== "Linux" then
+        copyString = string.gsub(copyString, [[/]], [[\]]) -- Converts paths to backslash for Windows.
+    else
         copyString = [[cp "]] .. source .. [[" "]] .. destination
     end
 
@@ -495,7 +495,13 @@ function love.directorydropped(path)
         ImageList = {}
         for i = 1 , #files do
             if files[i].type == "file" then
-                local imagePath = path .. '\\' .. files[i].name
+                local imagePath = path
+                if Os == "Windows" then
+                    imagePath = imagePath .. '\\'
+                    else
+                    imagePath = imagePath .. '/'
+                end
+                imagePath = imagePath .. files[i].name
                 if imagePath and (string.lower(string.sub(imagePath, #imagePath - 3, #imagePath)) == '.png' or string.lower(string.sub(imagePath, #imagePath - 3, #imagePath)) == '.jpg' or string.lower(string.sub(imagePath, #imagePath - 4, #imagePath)) == '.jpeg') then
                     print('Loaded ' .. imagePath)
                     ImageList[#ImageList + 1] = imagePath
@@ -633,8 +639,12 @@ function SplitChannel()
         love.filesystem.getSource() .. [[/cache/input.bin" -channel rgb -fx ]] ..
         channelString .. [[ "]] ..
         love.filesystem.getSource() .. [[/cache/grayscale.png"]]
+    elseif Os == "OS X" then
+        cmdString = [[magick "]] ..
+        love.filesystem.getSource() .. [[/cache/input.bin" -channel rgb -fx ]] ..
+        channelString .. [[ "]] ..
+        love.filesystem.getSource() .. [[/cache/grayscale.png"]]
     end
-
 
     print("\n" .. cmdString .. "\n")
     io.popen(cmdString):close()
@@ -705,9 +715,17 @@ function DitherImage()
         [[ --contrast ]] .. DitherParameters.Contrast ..
         ditherString
 
+    elseif Os == "OS X" then
+
+        cmdString = [[didder]].. [[ --palette "black white" -i ]] ..
+        inputString .. [[ -o "]] ..
+        love.filesystem.getSource() .. [[/cache/temp.png"]] ..
+        [[ --strength ]] .. DitherParameters.Strength ..
+        [[ --brightness ]] .. DitherParameters.Brightness ..
+        [[ --contrast ]] .. DitherParameters.Contrast ..
+        ditherString
+    
     end
-
-
 
     print("\n" .. cmdString .. "\n")
     io.popen(cmdString):close()
