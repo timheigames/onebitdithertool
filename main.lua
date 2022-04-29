@@ -6,7 +6,7 @@ function love.load(args)
     Grid = love.graphics.newImage("grid.png")
     Grid:setWrap('repeat', 'repeat')
     Grid:setFilter('linear', 'nearest')
-    
+
     ImageList = {}
     CurrentImageIndex = 0
     ImagePos = {X = 0, Y = 0}
@@ -80,6 +80,8 @@ function love.load(args)
     RandomMin = -0.5
     RandomMax = 0.5
 
+    Os = love.system.getOS()
+
     love.window.setMode(1280, 720, {resizable = true})
     --love.window.maximize()
     ResizeWindows()
@@ -114,7 +116,7 @@ function love.update(dt)
     -- This if statement handles the file browser, which allows opening a single image or multiple images using shift or control
     if OpenFile then
         local Result = Slab.FileDialog({Type = 'openfile', AllowMultiSelect = true})
-    
+
         if Result.Button == "OK" then
             if #(Result.Files) ~= 0 then
                 ImageList = {}
@@ -141,16 +143,16 @@ function love.update(dt)
         SaveAllImages()
         DoneSaving = true
     end
-    
+
     if CurrentlySaving then
         local saveMessage = "Saving..."
         if DoneSaving == true then
             saveMessage = "Saving... Done!"
         end
         local Result = Slab.MessageBox("Saving", saveMessage)
-    
+
         SaveMessageIsDisplayed = SaveMessageIsDisplayed + 1
-        
+
         if Result ~= "" then
             CurrentlySaving = false
             DoneSaving = false
@@ -162,12 +164,12 @@ function love.update(dt)
 
     local mousePosX, _ = Slab.GetMousePosition()
     PreviewWindowWidth, _ = Slab.GetWindowSize()
-    if mousePosX < PreviewWindowWidth and Slab.IsMouseDragging(1) then 
+    if mousePosX < PreviewWindowWidth and Slab.IsMouseDragging(1) then
         local deltaX, deltaY = Slab.GetMouseDelta()
         ImagePos.X = math.floor(ImagePos.X + deltaX)
         ImagePos.Y = math.floor(ImagePos.Y + deltaY)
     end
-    if not PreviewImage then 
+    if not PreviewImage then
         Slab.BeginLayout('OpenFileLayout', {AlignX = 'center', AlignY = 'center'})
         if Slab.Button('Open Image(s)...') then
             OpenFile = true
@@ -195,7 +197,7 @@ function love.update(dt)
 
     if PreviewImage then
         Slab.Text("Size: (" .. math.floor(ImageDataSize.Width * CurrentScale) .. "x" ..  math.floor(ImageDataSize.Height * CurrentScale) .. ")")
-        if Slab.Input('CurrentScale', {W = ToolbarElementWidth, Text = CurrentScale, NumbersOnly = true, MinNumber = 0.01, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then 
+        if Slab.Input('CurrentScale', {W = ToolbarElementWidth, Text = CurrentScale, NumbersOnly = true, MinNumber = 0.01, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then
             CurrentScale = Slab.GetInputNumber()
             ParameterChanged = true
         end
@@ -213,15 +215,15 @@ function love.update(dt)
     end
 
     if SplitChannelEnabled then
-        if Slab.Input('RedChannel', {W = ToolbarElementWidth, Text = ColorChannels.Red, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {1.0, 0.0, 0.0}}) then 
+        if Slab.Input('RedChannel', {W = ToolbarElementWidth, Text = ColorChannels.Red, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {1.0, 0.0, 0.0}}) then
             ColorChannels.Red = Slab.GetInputNumber()
             ChannelChanged = true
         end
-        if Slab.Input('GreenChannel', {W = ToolbarElementWidth, Text = ColorChannels.Green, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {0.0, 1.0, 0.0}}) then 
+        if Slab.Input('GreenChannel', {W = ToolbarElementWidth, Text = ColorChannels.Green, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {0.0, 1.0, 0.0}}) then
             ColorChannels.Green = Slab.GetInputNumber()
             ChannelChanged = true
         end
-        if Slab.Input('BlueChannel', {W = ToolbarElementWidth, Text = ColorChannels.Blue, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {0.0, 0.0, 1.0}}) then 
+        if Slab.Input('BlueChannel', {W = ToolbarElementWidth, Text = ColorChannels.Blue, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {0.0, 0.0, 1.0}}) then
             ColorChannels.Blue = Slab.GetInputNumber()
             ChannelChanged = true
         end
@@ -239,7 +241,7 @@ function love.update(dt)
         DitherParameters.Strength = 1.0
         DitherImage()
     end
-    if Slab.Input('Strength', {W = ToolbarElementWidth, Text = DitherParameters.Strength, NumbersOnly = true, MinNumber = -1.0, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then 
+    if Slab.Input('Strength', {W = ToolbarElementWidth, Text = DitherParameters.Strength, NumbersOnly = true, MinNumber = -1.0, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then
         DitherParameters.Strength = Slab.GetInputNumber()
         ParameterChanged = true
     end
@@ -248,7 +250,7 @@ function love.update(dt)
         DitherParameters.Brightness = 0.0
         DitherImage()
     end
-    if Slab.Input('Brightness', {W = ToolbarElementWidth, Text = DitherParameters.Brightness, NumbersOnly = true, MinNumber = -1.0, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then 
+    if Slab.Input('Brightness', {W = ToolbarElementWidth, Text = DitherParameters.Brightness, NumbersOnly = true, MinNumber = -1.0, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then
         DitherParameters.Brightness = Slab.GetInputNumber()
         ParameterChanged = true
     end
@@ -257,7 +259,7 @@ function love.update(dt)
         DitherParameters.Contrast = 0.0
         DitherImage()
     end
-    if Slab.Input('Contrast', {W = ToolbarElementWidth, Text = DitherParameters.Contrast, NumbersOnly = true, MinNumber = -1.0, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then 
+    if Slab.Input('Contrast', {W = ToolbarElementWidth, Text = DitherParameters.Contrast, NumbersOnly = true, MinNumber = -1.0, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then
         DitherParameters.Contrast = Slab.GetInputNumber()
         ParameterChanged = true
     end
@@ -286,7 +288,7 @@ function love.update(dt)
         end
 
         Slab.Separator({H = 20})
-        
+
         if UseCustomBayerType then
             Slab.BeginLayout('BayerComboLayout', {AlignX = 'center', Columns = 5})
             Slab.SetLayoutColumn(1)
@@ -333,13 +335,13 @@ function love.update(dt)
             RandomMax = 0.5
             DitherImage()
         end
-        if Slab.Input('Random Min', {W = ToolbarElementWidth, Text = RandomMin, NumbersOnly = true, MinNumber = -2.0, MaxNumber = 2.0, Precision = 2, UseSlider = true}) then 
+        if Slab.Input('Random Min', {W = ToolbarElementWidth, Text = RandomMin, NumbersOnly = true, MinNumber = -2.0, MaxNumber = 2.0, Precision = 2, UseSlider = true}) then
             RandomMin = Slab.GetInputNumber()
             if RandomMin > RandomMax then RandomMin = RandomMax end
             ParameterChanged = true
         end
 
-        if Slab.Input('Random Max', {W = ToolbarElementWidth, Text = RandomMax, NumbersOnly = true, MinNumber = -2.0, MaxNumber = 2.0, Precision = 2, UseSlider = true}) then 
+        if Slab.Input('Random Max', {W = ToolbarElementWidth, Text = RandomMax, NumbersOnly = true, MinNumber = -2.0, MaxNumber = 2.0, Precision = 2, UseSlider = true}) then
             RandomMax = Slab.GetInputNumber()
             if RandomMax < RandomMin then RandomMax = RandomMin end
             ParameterChanged = true
@@ -457,8 +459,16 @@ function love.mousereleased(x, y, button)
 
 -- Calls the copy command from the operating system, this is platform dependant
 function CopyFile(source, destination)
-    local copyString = [[copy "]] .. source .. [[" "]] .. destination
-    copyString = string.gsub(copyString, [[/]], [[\]]) -- Converts paths to backslash for Windows. I think Mac and Linux use forward slash.
+
+    local copyString = ""
+
+    if Os == "Windows" then
+        copyString = [[copy "]] .. source .. [[" "]] .. destination
+        copyString = string.gsub(copyString, [[/]], [[\]]) -- Converts paths to backslash for Windows. I think Mac and Linux use forward slash.
+    elseif Os== "Linux" then
+        copyString = [[cp "]] .. source .. [[" "]] .. destination
+    end
+
     print("\n" .. copyString .. "\n")
     io.popen(copyString):close()
 end
@@ -524,7 +534,7 @@ function GetFileName(path)
     return path
 end
 
--- Resize the toolbars when the window is resized 
+-- Resize the toolbars when the window is resized
 function ResizeWindows()
     ToolbarOptions = {X = love.graphics.getWidth() - (love.graphics.getWidth() / 4.0), Y = 0, W = love.graphics.getWidth() / 4.0, H = love.graphics.getHeight(), AutoSizeWindow = false, AllowResize = false, AllowFocus = false}
     ToolbarElementWidth = ToolbarOptions.W - 50
@@ -612,19 +622,19 @@ function SplitChannel()
     love.filesystem.getSource() .. [[/cache/input.bin" -channel rgb -fx ]] ..
     channelString .. [[ "]] ..
     love.filesystem.getSource() .. [[/cache/grayscale.png""]]
-    
+
     cmdString = string.gsub(cmdString, [[/]], [[\]])
 
     print("\n" .. cmdString .. "\n")
     io.popen(cmdString):close()
-    
+
     DitherImage()
 end
 
 -- Call the command line didder application with all of the parameters
 function DitherImage()
     if not PreviewImage then return end
-    
+
     local ditherString = ""
 
     if SelectedDitherType == 'Bayer Matrix' then
@@ -636,7 +646,7 @@ function DitherImage()
     elseif SelectedDitherType == 'Ordered Dithering Matrix' then
         ditherString = [[ odm ]] .. SelectedOrderedType
     elseif SelectedDitherType == 'Error Diffusion Matrix' then
-        if Serpentine then 
+        if Serpentine then
             ditherString = [[ edm --serpentine ]] .. SelectedErrorType
         else
             ditherString = [[ edm ]] .. SelectedErrorType
@@ -656,17 +666,37 @@ function DitherImage()
         scaleString = "-x " .. math.floor(ImageDataSize.Width * CurrentScale)
     end
 
-    local cmdString = [[""]] .. love.filesystem.getSource() ..
-    [[/didder_win64" ]] .. scaleString ..
-    [[ --palette "black white" -i ]] ..
-    inputString .. [[ -o "]] ..
-    love.filesystem.getSource() .. [[/cache/temp.png"]] ..
-    [[ --strength ]] .. DitherParameters.Strength ..
-    [[ --brightness ]] .. DitherParameters.Brightness ..
-    [[ --contrast ]] .. DitherParameters.Contrast ..
-    ditherString .. [[""]]
-    
-    cmdString = string.gsub(cmdString, [[/]], [[\]])
+    local cmdString = ""
+
+    if Os == "Windows" then
+
+        cmdString = [[""]] .. love.filesystem.getSource() ..
+        [[/didder_win64" ]] .. scaleString ..
+        [[ --palette "black white" -i ]] ..
+        inputString .. [[ -o "]] ..
+        love.filesystem.getSource() .. [[/cache/temp.png"]] ..
+        [[ --strength ]] .. DitherParameters.Strength ..
+        [[ --brightness ]] .. DitherParameters.Brightness ..
+        [[ --contrast ]] .. DitherParameters.Contrast ..
+        ditherString .. [[""]]
+
+        cmdString = string.gsub(cmdString, [[/]], [[\]])
+
+    elseif Os == "Linux" then
+
+        cmdString = [["]] .. love.filesystem.getSource() ..
+        [[/didder_linux64" ]] .. scaleString ..
+        [[ --palette "black white" -i ]] ..
+        inputString .. [[ -o "]] ..
+        love.filesystem.getSource() .. [[/cache/temp.png"]] ..
+        [[ --strength ]] .. DitherParameters.Strength ..
+        [[ --brightness ]] .. DitherParameters.Brightness ..
+        [[ --contrast ]] .. DitherParameters.Contrast ..
+        ditherString
+
+    end
+
+
 
     print("\n" .. cmdString .. "\n")
     io.popen(cmdString):close()
