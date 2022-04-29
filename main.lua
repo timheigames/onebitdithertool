@@ -717,7 +717,7 @@ function DitherImage()
 
     elseif Os == "OS X" then
 
-        cmdString = [[didder]].. [[ --palette "black white" -i ]] ..
+        cmdString = [[didder ]] .. scaleString .. [[ --palette "black white" -i ]] ..
         inputString .. [[ -o "]] ..
         love.filesystem.getSource() .. [[/cache/temp.png"]] ..
         [[ --strength ]] .. DitherParameters.Strength ..
