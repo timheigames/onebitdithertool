@@ -1,5 +1,5 @@
 # OneBitDitherTool
-A 1-bit dithering tool written in [Love2D](https://love2d.org/). This tool relies on the command line dithering tool [didder](https://github.com/makeworld-the-better-one/didder), command line image editor [ImageMagick](https://imagemagick.org/index.php), as well as the Lua libraries [Slab](https://github.com/flamendless/Slab) and [nativeFS](https://github.com/EngineerSmith/nativefs). It currently only runs on Windows, although adding Mac and Linux support should be relatively straightforward (see the section on [Mac and Linux support](https://github.com/timheigames/onebitdithertool#mac-and-linux-support) if you want to help).
+A 1-bit dithering tool written in [Love2D](https://love2d.org/). It currently supports both Windows and Linux. This tool relies on the command line dithering tool [didder](https://github.com/makeworld-the-better-one/didder), command line image editor [ImageMagick](https://imagemagick.org/index.php), as well as the Lua libraries [Slab](https://github.com/flamendless/Slab) and [nativeFS](https://github.com/EngineerSmith/nativefs).
 
 ![UI_example_image](https://user-images.githubusercontent.com/102014001/165626507-634bcc2a-2d00-4f4f-925f-5c749f3a3a26.png)
 
@@ -34,8 +34,8 @@ A 1-bit dithering tool written in [Love2D](https://love2d.org/). This tool relie
 - Select a Dither Type in the drop down menu. Each dither type will have different settings available.
 - When you are happy with the results, click "Save All To Output Folder". This will iterate through all of the loaded images, apply the same dithering to each one, and then copy the images to the "output" folder in the OneBitDitherTool directory. Output images are always .png files.
 
-## Mac and Linux support
-I only have access to a Windows PC, and I am not familiar with Linux. If anyone can get OneBitDitherTool working on another OS, please submit a pull request. Here is a list of things you will most likely need to change:
+## Mac support
+Here is a list of things you will most likely need to change:
 
 1. You will need the proper Love2D binary for your system. You can get it [here](https://love2d.org/). You will have to create an alternative method of running the app, such as a shell script. The `Run_OneBitDitherTool_Windows.bat` just runs the included love executable on the current directory (`%CD%/love-11.4-win64/love %CD%`)
 
