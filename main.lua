@@ -20,9 +20,17 @@ function love.load(args)
     DitherParameters = {Strength = 1.0, Brightness = 0.0, Contrast = 0.0}
     ParameterChanged = false
     SliderUpdateTimer = 0.0
+    ChannelUpdateTimer = 0.0
     ToolbarElementWidth = 150
     PreviewWindowWidth = 0
     ImageData = love.image.newImageData(1, 1)
+    ImageDataSize = {Width = 0, Height = 0}
+
+    SplitChannelEnabled = false
+    ColorChannels = {Red = 0.30, Green = 0.59, Blue = 0.11}
+    ChannelChanged = false
+
+    CurrentScale = 1
 
     SelectedDitherType = 'Bayer Matrix'
     DitherTypes = {'Bayer Matrix', 'Ordered Dithering Matrix', 'Error Diffusion Matrix', 'Random'}
@@ -86,6 +94,14 @@ end
 -- The update function draws the entire UI
 function love.update(dt)
     Slab.Update(dt)
+
+    if ChannelChanged and ChannelUpdateTimer ~= 0.0 then
+        if love.timer.getTime() - ChannelUpdateTimer >= 0.1 then
+            ChannelChanged = false
+            ChannelUpdateTimer = 0.0
+            SplitChannel()
+        end
+    end
 
     if ParameterChanged and SliderUpdateTimer ~= 0.0 then
         if love.timer.getTime() - SliderUpdateTimer >= 0.1 then
@@ -177,7 +193,48 @@ function love.update(dt)
         Slab.Text(CurrentFileName)
     end
 
+    if PreviewImage then
+        Slab.Text("Size: (" .. math.floor(ImageDataSize.Width * CurrentScale) .. "x" ..  math.floor(ImageDataSize.Height * CurrentScale) .. ")")
+        if Slab.Input('CurrentScale', {W = ToolbarElementWidth, Text = CurrentScale, NumbersOnly = true, MinNumber = 0.01, MaxNumber = 1.0, Precision = 2, UseSlider = true}) then 
+            CurrentScale = Slab.GetInputNumber()
+            ParameterChanged = true
+        end
+    end
+
     Slab.Separator({H = 20})
+
+    if Slab.CheckBox(SplitChannelEnabled, "Split Channels") then
+        SplitChannelEnabled = not SplitChannelEnabled
+        if SplitChannelEnabled and PreviewImage then
+            SplitChannel()
+        elseif PreviewImage then
+            DitherImage()
+        end
+    end
+
+    if SplitChannelEnabled then
+        if Slab.Input('RedChannel', {W = ToolbarElementWidth, Text = ColorChannels.Red, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {1.0, 0.0, 0.0}}) then 
+            ColorChannels.Red = Slab.GetInputNumber()
+            ChannelChanged = true
+        end
+        if Slab.Input('GreenChannel', {W = ToolbarElementWidth, Text = ColorChannels.Green, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {0.0, 1.0, 0.0}}) then 
+            ColorChannels.Green = Slab.GetInputNumber()
+            ChannelChanged = true
+        end
+        if Slab.Input('BlueChannel', {W = ToolbarElementWidth, Text = ColorChannels.Blue, NumbersOnly = true, MinNumber = 0.0, MaxNumber = 1.0, Precision = 2, UseSlider = true, BgColor = {0.0, 0.0, 1.0}}) then 
+            ColorChannels.Blue = Slab.GetInputNumber()
+            ChannelChanged = true
+        end
+        if Slab.Button('Reset') then
+            ColorChannels.Red = 0.30
+            ColorChannels.Green = 0.59
+            ColorChannels.Blue = 0.11
+            SplitChannel()
+        end
+    end
+
+    Slab.Separator({H = 20})
+
     if Slab.Button('Strength') then
         DitherParameters.Strength = 1.0
         DitherImage()
@@ -393,14 +450,10 @@ function love.mousereleased(x, y, button)
     if button == 1 and PreviewImage and ParameterChanged and SliderUpdateTimer == 0.0 then
         SliderUpdateTimer = love.timer.getTime()
     end
- end
-
--- This is used to prevent bug with didder not using the current slider values
-function love.keyreleased(key)
-    if key == 'return' and PreviewImage and ParameterChanged and SliderUpdateTimer == 0.0 then
-        SliderUpdateTimer = love.timer.getTime()
+    if button == 1 and PreviewImage and ChannelChanged and ChannelUpdateTimer == 0.0 then
+        ChannelUpdateTimer = love.timer.getTime()
     end
-end
+ end
 
 -- Calls the copy command from the operating system, this is platform dependant
 function CopyFile(source, destination)
@@ -449,7 +502,7 @@ end
 -- Copy an image and load it into the window
 function OpenImageFile(path)
     CurrentFileName = GetFileName(path)
-    CopyFile(path, love.filesystem.getSource() .. [[/input.bin"]])
+    CopyFile(path, love.filesystem.getSource() .. [[/cache/input.bin"]])
     LoadImage()
 end
 
@@ -494,7 +547,9 @@ function LoadImage()
         ImageData:release()
         ImageData = nil
     end
-    ImageData = love.image.newImageData('input.bin')
+    ImageData = love.image.newImageData('cache/input.bin')
+    ImageDataSize.Width = ImageData:getWidth()
+    ImageDataSize.Height = ImageData:getHeight()
     PreviewImage = love.graphics.newImage(ImageData)
     PreviewImage:setFilter('nearest', 'nearest')
 
@@ -504,7 +559,11 @@ function LoadImage()
     end
 
     ResizeWindows()
-    DitherImage()
+    if SplitChannelEnabled then
+        SplitChannel()
+    else
+        DitherImage()
+    end
 end
 
 -- Iterate through all images in the list, dither each one, and save it to the output folder
@@ -518,28 +577,54 @@ end
 
 -- Copy the dithered image to the output folder, using the current file name for the png
 function SaveImage()
-    CopyFile(love.filesystem.getSource() .. [[/temp.png]], love.filesystem.getSource() .. [[/output/]] .. CurrentFileName .. [[.png"]])
+    CopyFile(love.filesystem.getSource() .. [[/cache/temp.png]], love.filesystem.getSource() .. [[/output/]] .. CurrentFileName .. [[.png"]])
 end
 
 -- Reload the image when switching between dithered and original image
 function ReloadImage()
     if ShowOriginal then
+        Slab.ResetImageCache()
         ImageData:release()
         ImageData = nil
-        ImageData = love.image.newImageData('input.bin')
-        PreviewImage:replacePixels(ImageData)
+        ImageData = love.image.newImageData('cache/input.bin')
+        PreviewImage = nil
+        PreviewImage = love.graphics.newImage(ImageData)
+        PreviewImage:setFilter('nearest', 'nearest')
+        --PreviewImage:replacePixels(ImageData)
     else
+        Slab.ResetImageCache()
         ImageData:release()
         ImageData = nil
-        ImageData = love.image.newImageData('temp.png')
-        PreviewImage:replacePixels(ImageData)
+        ImageData = love.image.newImageData('cache/temp.png')
+        PreviewImage = nil
+        PreviewImage = love.graphics.newImage(ImageData)
+        PreviewImage:setFilter('nearest', 'nearest')
+        --PreviewImage:replacePixels(ImageData)
     end
+end
+
+function SplitChannel()
+    local channelString = [["]] .. ColorChannels.Red .. [[*r+]] .. ColorChannels.Green .. [[*g+]] .. ColorChannels.Blue .. [[*b"]]
+
+    --magick convert input.png -fx "0.3*r+0.6*g+0.1*b" output.png
+    local cmdString = [[""]] .. love.filesystem.getSource() ..
+    [[/magick" "]] ..
+    love.filesystem.getSource() .. [[/cache/input.bin" -channel rgb -fx ]] ..
+    channelString .. [[ "]] ..
+    love.filesystem.getSource() .. [[/cache/grayscale.png""]]
+    
+    cmdString = string.gsub(cmdString, [[/]], [[\]])
+
+    print("\n" .. cmdString .. "\n")
+    io.popen(cmdString):close()
+    
+    DitherImage()
 end
 
 -- Call the command line didder application with all of the parameters
 function DitherImage()
     if not PreviewImage then return end
-
+    
     local ditherString = ""
 
     if SelectedDitherType == 'Bayer Matrix' then
@@ -560,10 +645,22 @@ function DitherImage()
         ditherString = [[ random ]] .. RandomMin .. [[ ]] .. RandomMax
     end
 
+    local inputString = [["]] .. love.filesystem.getSource() .. [[/cache/input.bin"]]
+
+    if SplitChannelEnabled then
+        inputString = [["]] .. love.filesystem.getSource() .. [[/cache/grayscale.png"]]
+    end
+
+    local scaleString = ""
+    if CurrentScale < 1.0 then
+        scaleString = "-x " .. math.floor(ImageDataSize.Width * CurrentScale)
+    end
+
     local cmdString = [[""]] .. love.filesystem.getSource() ..
-    [[/didder_win64" --palette "black white" -i "]] ..
-    love.filesystem.getSource() .. [[/input.bin" -o "]] ..
-    love.filesystem.getSource() .. [[/temp.png"]] ..
+    [[/didder_win64" ]] .. scaleString ..
+    [[ --palette "black white" -i ]] ..
+    inputString .. [[ -o "]] ..
+    love.filesystem.getSource() .. [[/cache/temp.png"]] ..
     [[ --strength ]] .. DitherParameters.Strength ..
     [[ --brightness ]] .. DitherParameters.Brightness ..
     [[ --contrast ]] .. DitherParameters.Contrast ..
@@ -575,6 +672,6 @@ function DitherImage()
     io.popen(cmdString):close()
     ImageData:release()
     ImageData = nil
-    ImageData = love.image.newImageData('temp.png')
+    ImageData = love.image.newImageData('cache/temp.png')
     ReloadImage()
 end
