@@ -616,14 +616,25 @@ end
 function SplitChannel()
     local channelString = [["]] .. ColorChannels.Red .. [[*r+]] .. ColorChannels.Green .. [[*g+]] .. ColorChannels.Blue .. [[*b"]]
 
-    --magick convert input.png -fx "0.3*r+0.6*g+0.1*b" output.png
-    local cmdString = [[""]] .. love.filesystem.getSource() ..
-    [[/magick" "]] ..
-    love.filesystem.getSource() .. [[/cache/input.bin" -channel rgb -fx ]] ..
-    channelString .. [[ "]] ..
-    love.filesystem.getSource() .. [[/cache/grayscale.png""]]
+    local cmdString = ""
 
-    cmdString = string.gsub(cmdString, [[/]], [[\]])
+    --magick convert input.png -fx "0.3*r+0.6*g+0.1*b" output.png
+    if Os == "Windows" then
+        cmdString = [[""]] .. love.filesystem.getSource() ..
+        [[/magick" "]] ..
+        love.filesystem.getSource() .. [[/cache/input.bin" -channel rgb -fx ]] ..
+        channelString .. [[ "]] ..
+        love.filesystem.getSource() .. [[/cache/grayscale.png""]]
+
+        cmdString = string.gsub(cmdString, [[/]], [[\]])
+    elseif Os == "Linux" then
+        cmdString = [["]] .. love.filesystem.getSource() ..
+        [[/magick" "]] ..
+        love.filesystem.getSource() .. [[/cache/input.bin" -channel rgb -fx ]] ..
+        channelString .. [[ "]] ..
+        love.filesystem.getSource() .. [[/cache/grayscale.png"]]
+    end
+
 
     print("\n" .. cmdString .. "\n")
     io.popen(cmdString):close()
