@@ -1,8 +1,7 @@
 # OneBitDitherTool
-A 1-bit dithering tool written in [Love2D](https://love2d.org/). It currently supports both Windows and Linux. This tool relies on the command line dithering tool [didder](https://github.com/makeworld-the-better-one/didder), command line image editor [ImageMagick](https://imagemagick.org/index.php), as well as the Lua libraries [Slab](https://github.com/flamendless/Slab) and [nativeFS](https://github.com/EngineerSmith/nativefs).
+A 1-bit dithering tool written in [Love2D](https://love2d.org/). It currently supports Windows, Linux and macOS. This tool relies on the command line dithering tool [didder](https://github.com/makeworld-the-better-one/didder), command line image editor [ImageMagick](https://imagemagick.org/index.php), as well as the Lua libraries [Slab](https://github.com/flamendless/Slab) and [nativeFS](https://github.com/EngineerSmith/nativefs).
 
 ![UI_example_image](https://user-images.githubusercontent.com/102014001/165626507-634bcc2a-2d00-4f4f-925f-5c749f3a3a26.png)
-
 
 ## Features
 - Supports all dithering algorithms provided by didder:
@@ -20,9 +19,30 @@ A 1-bit dithering tool written in [Love2D](https://love2d.org/). It currently su
 - Resize the image before dithering is applied.
 - A toggle button to show the original image for making comparisons.
 
+## macOS prerequisites
+The app requires `lua`, the love2d framework and the `didder` app. Those are easily installed via [homebrew][https://brew.sh].
+
+- Open a terminal window and install homebrew by typing `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`.
+- Install `lua` by typing `brew install lua`.
+- Install the love2d framework by typing `brew install love`.
+- Add a cask for the developer of `didder` by typing `brew tap makeworld-the-better-one/tap`.
+- Install the `didder` command line tool by typing `brew install didder`.
+
+If you wish to use split RGB channel tweaking, you will also need `imageMagick`:
+
+- Install the imageMagick command line tool by typing `brew install imagemagick`.
+
+Unfortunately the love2d framework is not code-signed correctly so if you have the standard security settings, you will need to tell macOS to ignore that when using it.
+
+- Go to `Applications`, right click on `Love` then select Open.
+- You will get a notification that the app is from an unidentified developer, click Ok and close the `Love` app.
+- In the finder menu open click on Go->Open Folder and type `/opt/homebrew/bin/`
+- Right click on `love` then select Open.
+- You will get a notification that the app is from an unidentified developer, click Ok.
+
 ## How to use
 - Download and extract OneBitDitherTool from the [Releases](https://github.com/timheigames/onebitdithertool/releases) section.
-- Run the app by using "Run_OneBitDitherTool_Windows.bat" or "Run_OneBitDitherTool_Linux.sh".
+- Run the app by using "Run_OneBitDitherTool_Windows.bat", "Run_OneBitDitherTool_Linux.sh" or `Run_OneBitDitherTool_macOS.sh`.
 - You can drag a single image into the window, drag a folder into the window, or use the file browser. (.png, .jpg, .jpeg are supported)
   - Dragging a folder will scan through the folder and find all .png, .jpg, and .jpeg files. Any other files will be ignored.
   - While using the file browser, you can select multiple files using CTRL+Click or SHIFT+Click. You must click "OK" to load the files, double clicking does not work.
@@ -33,18 +53,3 @@ A 1-bit dithering tool written in [Love2D](https://love2d.org/). It currently su
 - Adjust Strength, Brightness, and Contrast sliders with the mouse. Clicking the name of the slider will reset to the default value.
 - Select a Dither Type in the drop down menu. Each dither type will have different settings available.
 - When you are happy with the results, click "Save All To Output Folder". This will iterate through all of the loaded images, apply the same dithering to each one, and then copy the images to the "output" folder in the OneBitDitherTool directory. Output images are always .png files.
-
-## Mac support
-Here is a list of things you will most likely need to change:
-
-1. You will need the proper Love2D binary for your system. You can get it [here](https://love2d.org/). You will have to create an alternative method of running the app, such as a shell script. The `Run_OneBitDitherTool_Windows.bat` just runs the included love executable on the current directory (`%CD%/love-11.4-win64/love %CD%`)
-
-2. Due to the limitations of Love2D when it comes to accessing the filesystem outside of the game folder, I have had to utilize Lua's `io.popen` function to run cmd commands. I use these commands to copy the image files to the game folder (as input.bin), and copy the dithered image to the output folder. For supporting Mac and Linux, these calls would need to be replaced by the respective OS alternatives.
-
-3. I also use `io.popen` to run the didder command line app. [Didder](https://github.com/makeworld-the-better-one/didder/releases) has release executables for every kind of system, so it should be relatively simple to download yours and fix the "io.popen" call.
-
-4. The `io.popen` calls might also need to be adjusted for your OS's directory structure (forward/backward slash), and for your OS's argument formatting.
-
-5. You should be able to wrap OS specific code with [love.system.getOS()](https://love2d.org/wiki/love.system.getOS).
-
-6. I also use nativeFS specifically for allowing the "drag folder to window" feature. I'm not sure if nativeFS works with Mac and Linux. If it doesn't you could just wrap the `love.directorydropped(path)` function with `if love.system.getOS() == "Windows" then`.
