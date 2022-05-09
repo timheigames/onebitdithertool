@@ -35,7 +35,7 @@ A 1-bit dithering tool written in [Love2D](https://love2d.org/). It currently su
 
 
 ## macOS prerequisites
-The app requires `lua`, the love2d framework and the `didder` app. Those are easily installed via [homebrew][https://brew.sh].
+The app requires `lua`, the love2d framework and the `didder` app. Those are easily installed via [homebrew](https://brew.sh).
 
 - Open a terminal window and install homebrew by typing `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`.
 - Install `lua` by typing `brew install lua`.
